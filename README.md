@@ -1,4 +1,5 @@
 # StackSmith-UI
+![alt text](docs/StackSmithLOGO.png)
 
 StackSmith-UI is a React/Next.js frontend application designed to interact with a backend API that generates reproducible HPC software environment specifications using Spack. It allows users to select software packages, specify versions, variants, and compilers, and generates a Spack YAML configuration for easy environment building.
 
