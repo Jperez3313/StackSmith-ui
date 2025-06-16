@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 
+const [variants, setVariants] = useState<string[]>([]);
+
 interface PackageSpec {
   name: string;
   version?: string;
@@ -11,7 +13,6 @@ interface PackageSpec {
 
 export default function SpackForm() {
   const [compiler, setCompiler] = useState("");
-  const [variants, setVariants] = useState<string[]>([]);
   const [specs, setSpecs] = useState<PackageSpec[]>([
     { name: "", version: "", variants: "", compiler: "" },
   ]);
@@ -21,7 +22,7 @@ export default function SpackForm() {
     setSpecs([...specs, { name: "", version: "", variants: "", compiler: "" }]);
   }
 
-  async function updatePackage(
+  function updatePackage(
     index: number,
     field: keyof PackageSpec,
     value: string,
@@ -29,18 +30,6 @@ export default function SpackForm() {
     const newSpecs = specs.slice();
     newSpecs[index][field] = value;
     setSpecs(newSpecs);
-
-    // Fetch variants when package name changes
-    if (field === "name" && value.trim() !== "") {
-      try {
-        const res = await fetch(`http://localhost:8001/variants/${value}`);
-        const data = await res.json();
-        setVariants(data.variants || []);
-      } catch (err) {
-        console.error("Failed to fetch variants:", err);
-        setVariants([]);
-      }
-    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -56,6 +45,15 @@ export default function SpackForm() {
         compiler: compiler || undefined,
       })),
       compiler,
+      if (field === "name") {
+        try {
+          const res = await fetch(`http://localhost:8001/variants/${value}`);
+          const data = await res.json();
+          setVariants(data.variants);
+        } catch (err)
+          console.error("Failed to fetch variants:", err)
+          setVariants([]);
+      }
     };
 
     try {
@@ -106,18 +104,18 @@ export default function SpackForm() {
             <input
               type="text"
               placeholder="Version"
-              value={pkg.version || ""}
+              value={pkg.version}
               onChange={(e) => updatePackage(i, "version", e.target.value)}
               className="border px-2 py-1 rounded"
             />
             <select
-              value={pkg.variants || ""}
+              value={pkg.variants}
               onChange={(e) => updatePackage(i, "variants", e.target.value)}
               className="border p-2 rounded"
             >
-              <option value="">-- Select a Variant --</option>
-              {variants.map((variant) => (
-                <option key={variant} value={`+${variant}`}>
+             <option value="">-- Select a Variant --</option>
+             {variants.map((variant) => (
+                <option key={variant} value={+${variant}}>
                   +{variant}
                 </option>
               ))}
@@ -125,7 +123,7 @@ export default function SpackForm() {
             <input
               type="text"
               placeholder="Compiler"
-              value={pkg.compiler || ""}
+              value={pkg.compiler}
               onChange={(e) => updatePackage(i, "compiler", e.target.value)}
               className="border px-2 py-1 rounded"
             />
