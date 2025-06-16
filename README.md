@@ -13,6 +13,7 @@ StackSmith-UI is a React/Next.js frontend application designed to interact with 
 - Connects to a backend API to generate valid Spack environment YAML files
 - Responsive and user-friendly UI (built with React and Next.js)
 - Easily extensible for additional package metadata and features
+- Drop down menu of all available variants for specified package
 
 ---
 
